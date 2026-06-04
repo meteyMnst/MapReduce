@@ -1,27 +1,53 @@
-# Bordo Mavi Bulut Arama Motoru 🔴🔵
+# 🔴🔵 Bordo Mavi Bulut Arama Motoru
 
-## 🎯 Proje Amacı
-Bu proje, devasa boyutlardaki metin verilerini hızlı bir şekilde endeksleyip arama yapılabilmesini sağlayan, **Serverless (Sunucusuz)** ve tam otomatik bir arama motoru mimarisidir. Google altyapısına benzer "MapReduce" mantığını bulut üzerinde uygular.
+Tamamen **Serverless (Sunucusuz)** mimari üzerine inşa edilmiş, yüksek performanslı ve otomatik ölçeklenebilir bir arama motoru projesi. Bu proje, devasa boyutlardaki metin verilerini hızlı bir şekilde endeksleyip arama yapılabilmesini sağlamak amacıyla Google'ın temelini oluşturan **MapReduce** konseptinin modern AWS bulut servisleriyle uygulanmış halidir.
 
-## ☁️ AWS'nin Rolü ve Nerede Kullanıldığı
-Tüm mimari **AWS (Amazon Web Services)** üzerinde %100 Serverless (sunucusuz) olarak çalışır. Hiçbir geleneksel sunucu kullanılmaz:
-- **AWS S3:** Projenin kalbidir. Hem veritabanı (ham verileri ve endeks dosyalarını depolama) hem de Frontend (statik web sitesi arayüzünü barındırma) olarak kullanılır.
-- **AWS Lambda:** Verileri aynı anda parçalamak (Mapper), hesaplayıp birleştirmek (Reducer) ve kullanıcının arama sorgularını anlık işlemek (Search) için sadece tetiklendikçe çalışır.
-- **AWS API Gateway:** Kullanıcının arayüzden yaptığı aramaları güvenli bir şekilde Search Lambda'sına ileten köprüdür.
+---
 
-## 📊 Verinin Toplanması ve Depolanması
-- **Veri Nasıl Toplandı?**: Sistemin verileri, `fetch_fast.py` Python betiği kullanılarak **Wikipedia API**'sinden canlı ve rastgele makaleler çekilerek toplanır. Çekilen her makalenin başlığı, URL'si ve içerik metni otomatik olarak alınır.
-- **Veri Nasıl Depolanıyor?**: Toplanan devasa veriler önce parçalanarak tekil `.json` dosyalarına dönüştürülür. Daha sonra tamamı **AWS S3** bucket'ına yüklenir. S3'e düşen her ham dosya (raw-pages), MapReduce işleminden geçtikten sonra yine AWS S3 üzerinde ana endeks dosyası (inverted_index.json) olarak bulutta güvenle depolanır.
+## 🎯 Temel Özellikler
 
-## ⚙️ MapReduce Mimarisi
-- **Mapper:** S3'e yeni bir makale yüklendiği an *otomatik* tetiklenir. Metni kelimelere böler, frekanslarını sayar ve `map-output/` klasörüne yazar. S3'e 500 dosya atarsanız, 500 AWS Lambda fonksiyonu eşzamanlı çalışır.
-- **Reducer:** Parçalanan verileri toplar, TF-IDF skorlamasını hesaplar ve arama motorunun kullanacağı devasa ana sözlüğü oluşturur.
+* **%100 Sunucusuz Mimari:** Geleneksel sunucu yönetimi yoktur, sadece işlem yapıldığında çalışan ve maliyet çıkaran bir yapı (Pay-as-you-go) kullanılmıştır.
+* **Olay Güdümlü (Event-Driven) Çalışma:** S3'e yüklenen her yeni veri, anında kendi Lambda fonksiyonunu tetikleyerek eşzamanlı (concurrent) işlem gücü sağlar.
+* **TF-IDF Algoritması:** Arama sonuçları, metin madenciliği standartlarına uygun olarak TF-IDF (Term Frequency-Inverse Document Frequency) skorlamasına göre sıralanır.
+* **Otomatik Altyapı Kurulumu:** Tüm AWS kaynakları (IAM, S3, Lambda, API Gateway) tek bir PowerShell betiği ile saniyeler içinde ayağa kaldırılır.
 
-## 📂 Dosyalama
-- `arama-motoru/scripts/`: `mapper.py`, `reducer.py`, `search.py` ve Trabzonspor temalı `index.html` arayüz dosyası.
-- `aws_setup.ps1`: Tüm AWS IAM, Lambda, S3 ve API altyapısını otomatik kuran powershell betiği.
+---
 
-## 🚀 Kullanım
-1. `index.html` S3 üzerinde yayındadır. Arama sayfasına gidilir.
-2. Aranmak istenen kelime yazılır.
-3. API Gateway üzerinden AWS Lambda'ya istek gider, S3'teki endeks taranır ve en yüksek skora sahip sonuçlar anında listelenir.
+## ☁️ AWS Mimarisindeki Bileşenler
+
+Sistem aşağıdaki Amazon Web Services (AWS) teknolojileri üzerinde çalışmaktadır:
+
+* **AWS S3 (Simple Storage Service):** Projenin ana veri merkezidir. Hem ham verileri (Raw Data) hem Inverted Index dosyalarını güvenle depolar. Ayrıca Trabzonspor temalı statik Frontend arayüzünü (Web Hosting) barındırır.
+* **AWS Lambda:** Sistemin işlem gücüdür. Verileri parçalayan (Mapper), kelime frekanslarını birleştirip hesaplayan (Reducer) ve API'den gelen arama sorgularını anlık olarak işleyen (Search) fonksiyonları barındırır.
+* **AWS API Gateway:** Kullanıcının web arayüzünden yaptığı arama sorgularını karşılayıp güvenli bir REST API formatında Search Lambda fonksiyonuna ileten köprü görevini üstlenir.
+
+---
+
+## 🔄 Veri Akışı ve MapReduce Süreci
+
+### 1. Veri Toplama ve Depolama
+Veriler, `fetch_fast.py` betiği aracılığıyla **Wikipedia API** üzerinden canlı ve rastgele makaleler çekilerek elde edilir. Çekilen makalelerin başlık, URL ve içerik metinleri tekil `.json` dosyalarına dönüştürülerek AWS S3 bucket'ına (raw-pages) aktarılır.
+
+### 2. Map (Parçalama) Evresi
+S3'e yeni bir ham makale dosyası eklendiği anda **Mapper** Lambda fonksiyonu otomatik olarak tetiklenir. Metni kelimelere böler, gereksiz karakterleri temizler, frekanslarını sayar ve sonuçları `map-output/` klasörüne kaydeder. Sisteme 500 dosya yüklenirse, 500 adet Mapper fonksiyonu eşzamanlı olarak devreye girer.
+
+### 3. Reduce (Birleştirme ve Endeksleme) Evresi
+**Reducer** fonksiyonu, parçalanmış map verilerini toplar. TF-IDF skorlamalarını hesaplayarak arama motorunun bel kemiği olan devasa ana sözlüğü (`inverted_index.json`) oluşturur ve bunu tekrar S3 üzerinde konumlandırır.
+
+---
+
+## 📂 Proje Yapısı
+
+Sistemin klasör hiyerarşisi aşağıdaki gibidir:
+
+```text
+MapReduce/
+├── arama-motoru/
+│   ├── scripts/
+│   │   ├── mapper.py        # Metin parçalama ve frekans hesabı
+│   │   ├── reducer.py       # Verileri birleştirme ve TF-IDF skorlaması
+│   │   └── search.py        # API Gateway üzerinden gelen sorguları işleme
+│   └── index.html           # Trabzonspor temalı, S3'te barındırılan arama arayüzü
+├── veri-toplama/
+│   └── fetch_fast.py        # Wikipedia'dan rastgele makale çeken script
+└── aws_setup.ps1            # AWS altyapısını otomatik kuran deployment betiği
