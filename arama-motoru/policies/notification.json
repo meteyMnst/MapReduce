@@ -1,0 +1,16 @@
+{
+    "LambdaFunctionConfigurations": [
+        {
+            "LambdaFunctionArn": "arn:aws:lambda:eu-central-1:599633425745:function:arama-mapper",
+            "Events": ["s3:ObjectCreated:*"],
+            "Filter": {
+                "Key": {
+                    "FilterRules": [
+                        { "Name": "prefix", "Value": "raw-pages/" },
+                        { "Name": "suffix", "Value": ".json" }
+                    ]
+                }
+            }
+        }
+    ]
+}

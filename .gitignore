@@ -1,0 +1,28 @@
+# Data ve S3 Yedekleri
+arama-motoru/data/
+*.xml.bz2
+*.jsonl
+
+# AWS Lambda Deployment Paketleri
+arama-motoru/scripts/*.zip
+*.zip
+
+# Test ve Komut Çıktıları
+response*.json
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+# İşletim Sistemi ve IDE Dosyaları
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

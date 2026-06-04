@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trabzonspor'da Ara</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+    :root {
+        --bordo: #8A1538;
+        --mavi: #0072CE;
+        --bg-color: #ffffff;
+        --text-main: #202124;
+        --text-secondary: #70757a;
+        --link-color: #1a0dab;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Roboto', arial, sans-serif;
+        background-color: var(--bg-color);
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        /* Subtle isometric cube background effect */
+        background-image: 
+            linear-gradient(30deg, #fafafa 12%, transparent 12.5%, transparent 87%, #fafafa 87.5%, #fafafa),
+            linear-gradient(150deg, #fafafa 12%, transparent 12.5%, transparent 87%, #fafafa 87.5%, #fafafa),
+            linear-gradient(30deg, #fafafa 12%, transparent 12.5%, transparent 87%, #fafafa 87.5%, #fafafa),
+            linear-gradient(150deg, #fafafa 12%, transparent 12.5%, transparent 87%, #fafafa 87.5%, #fafafa),
+            linear-gradient(60deg, #f5f5f5 25%, transparent 25.5%, transparent 75%, #f5f5f5 75%, #f5f5f5),
+            linear-gradient(60deg, #f5f5f5 25%, transparent 25.5%, transparent 75%, #f5f5f5 75%, #f5f5f5);
+        background-size: 40px 70px;
+        background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px;
+    }
+
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(5px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 1px solid transparent;
+        transition: border-bottom 0.3s;
+    }
+
+    .top-bar.shadow {
+        border-bottom: 1px solid #ebebeb;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .menu-icon svg {
+        fill: #5f6368;
+        cursor: pointer;
+    }
+
+    .top-logo {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--bordo);
+        letter-spacing: 1px;
+    }
+
+    .profile-icon {
+        width: 32px;
+        height: 32px;
+        background: var(--mavi);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .main-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: -50px;
+    }
+
+    .main-wrapper.searched {
+        justify-content: flex-start;
+        margin-top: 0;
+        padding-top: 10px;
+    }
+
+    .center-logo {
+        margin-bottom: 30px;
+        transition: all 0.5s ease;
+    }
+
+    .center-logo img {
+        height: 120px;
+        transition: all 0.5s ease;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+
+    .main-wrapper.searched .center-logo img {
+        height: 60px;
+        margin-bottom: 10px;
+    }
+
+    .search-container {
+        width: 100%;
+        max-width: 584px;
+        transition: all 0.5s ease;
+    }
+
+    .main-wrapper.searched .search-container {
+        max-width: 650px;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        background: white;
+        border: 1px solid #dfe1e5;
+        border-radius: 24px;
+        height: 48px;
+        padding: 5px 14px 5px 14px;
+        transition: box-shadow 0.3s, border-color 0.3s;
+    }
+
+    .search-bar:hover, .search-bar:focus-within {
+        box-shadow: 0 1px 6px rgba(32,33,36,.28);
+        border-color: rgba(223,225,229,0);
+    }
+
+    .search-icon svg {
+        fill: #9aa0a6;
+        margin-right: 10px;
+        margin-top: 3px;
+    }
+
+    .search-bar input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        font-family: inherit;
+        color: var(--text-main);
+    }
+
+    .mic-icon {
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 50%;
+        transition: background 0.2s;
+    }
+    
+    .mic-icon:hover {
+        background: #f1f3f4;
+    }
+
+    .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 28px;
+        transition: opacity 0.3s;
+    }
+
+    .main-wrapper.searched .buttons {
+        display: none;
+    }
+
+    .buttons button {
+        background-color: #f8f9fa;
+        border: 1px solid #f8f9fa;
+        border-radius: 4px;
+        color: #3c4043;
+        font-family: inherit;
+        font-size: 14px;
+        padding: 10px 24px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .buttons button:hover {
+        box-shadow: 0 1px 1px rgba(0,0,0,.1);
+        border-color: #dadce0;
+        color: var(--text-main);
+    }
+
+    .stats {
+        text-align: center;
+        margin-top: 25px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        transition: opacity 0.3s;
+    }
+
+    .main-wrapper.searched .stats {
+        display: none;
+    }
+
+    .stats span {
+        background: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        color: var(--bordo);
+        font-weight: 500;
+    }
+
+    #sonuc {
+        width: 100%;
+        max-width: 650px;
+        margin: 30px auto 0;
+        text-align: left;
+        opacity: 0;
+        display: none;
+        padding: 0 20px;
+    }
+
+    .main-wrapper.searched #sonuc {
+        display: block;
+        animation: fadeIn 0.6s forwards ease;
+    }
+
+    .result-stats {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ebebeb;
+    }
+
+    .result-item {
+        margin-bottom: 28px;
+        animation: slideUp 0.5s ease forwards;
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    .result-url {
+        font-size: 12px;
+        color: var(--text-main);
+        margin-bottom: 5px;
+        display: block;
+        text-decoration: none;
+    }
+
+    .result-title {
+        font-size: 20px;
+        color: var(--link-color);
+        text-decoration: none;
+        margin-bottom: 4px;
+        display: block;
+        font-weight: 400;
+    }
+
+    .result-title:hover {
+        text-decoration: underline;
+    }
+
+    .result-desc {
+        font-size: 14px;
+        color: #4d5156;
+        line-height: 1.58;
+    }
+
+    .result-desc strong {
+        color: var(--text-main);
+    }
+
+    .tag {
+        display: inline-block;
+        font-size: 11px;
+        color: var(--mavi);
+        background: #e8f0fe;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-top: 6px;
+    }
+
+    .footer {
+        background: #f2f2f2;
+        color: var(--text-secondary);
+        font-size: 14px;
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .footer-top {
+        padding: 15px 30px;
+        border-bottom: 1px solid #dadce0;
+        color: var(--text-secondary);
+    }
+
+    .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 30px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .footer-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        margin-right: 25px;
+    }
+
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+
+    .loader-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--bordo);
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+
+    .spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(138, 21, 56, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--bordo);
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+        .footer-bottom {
+            justify-content: center;
+            text-align: center;
+        }
+        .footer-links {
+            margin-bottom: 10px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="top-bar" id="topBar">
+    <div class="menu-icon">
+        <svg focusable="false" viewBox="0 0 24 24" width="24" height="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>
+    </div>
+    <div class="top-logo">TRABZONSPOR</div>
+    <div class="profile-icon">TS</div>
+</div>
+
+<div class="main-wrapper" id="mainWrapper">
+    <div class="center-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/tr/a/ab/TrabzonsporAmblemi.png" alt="Trabzonspor Logo">
+    </div>
+    
+    <div class="search-container">
+        <div class="search-bar">
+            <div class="search-icon">
+                <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+            </div>
+            <input type="text" id="q" placeholder="Trabzonspor'da Ara..." onkeypress="if(event.key==='Enter') ara()">
+            <div class="mic-icon" onclick="alert('Mikrofon erişimi şu an kapalı.')">
+                <svg focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="#8A1538" d="m12 15c1.66 0 3-1.31 3-2.97v-7.02c0-1.66-1.34-3.01-3-3.01s-3 1.34-3 3.01v7.02c0 1.66 1.34 2.97 3 2.97z"></path><path fill="#0072CE" d="m11 18.08h2v3.92h-2z"></path><path fill="#fbbc05" d="m7.05 16.87c-1.27-1.33-2.05-2.83-2.05-4.87h2c0 1.45.56 2.42 1.47 3.38v.32l-1.15 1.18z"></path><path fill="#ea4335" d="m12 16.93a4.97 5.25 0 0 1 -3.54 -1.55l-1.41 1.49c1.26 1.34 3.02 2.13 4.95 2.13 3.87 0 6.99-2.92 6.99-7h-1.99c0 2.92-2.24 4.93-5 4.93z"></path></svg>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button onclick="ara()">Arama Yap</button>
+            <button onclick="firtina()">Kendimi Fırtına Gibi Hissediyorum</button>
+        </div>
+
+        <div class="stats">
+            <span>Altyapı: AWS MapReduce</span>
+            <span>İndeks: 8.293 Kelime</span>
+        </div>
+    </div>
+    
+    <div id="sonuc"></div>
+</div>
+
+<div class="footer">
+    <div class="footer-top">Trabzon, Türkiye</div>
+    <div class="footer-bottom">
+        <div class="footer-links">
+            <a href="#">Hakkımızda</a>
+            <a href="#">Reklam</a>
+            <a href="#">İşletme</a>
+        </div>
+        <div class="footer-links">
+            <a href="#">Gizlilik</a>
+            <a href="#">Şartlar</a>
+            <a href="#">Ayarlar</a>
+        </div>
+    </div>
+</div>
+
+<script>
+const API = "https://to468ckmi4.execute-api.eu-central-1.amazonaws.com/prod/search";
+
+window.addEventListener('scroll', () => {
+    if(window.scrollY > 10) {
+        document.getElementById('topBar').classList.add('shadow');
+    } else {
+        document.getElementById('topBar').classList.remove('shadow');
+    }
+});
+
+function firtina() {
+    const q = document.getElementById('q').value;
+    if(q) {
+        ara();
+    } else {
+        document.getElementById('q').value = "Trabzonspor";
+        ara();
+    }
+}
+
+async function ara(){
+    const q = document.getElementById('q').value;
+    if(!q) return;
+    
+    // Animasyonu tetikle
+    document.getElementById('mainWrapper').classList.add('searched');
+    
+    const sonucDiv = document.getElementById('sonuc');
+    sonucDiv.innerHTML = '<div class="loader-container"><div class="spinner"></div><span>Fırtına bulutlarda arıyor...</span></div>';
+    
+    try{
+        const startTime = performance.now();
+        const res = await fetch(API + "?q=" + encodeURIComponent(q));
+        const data = await res.json();
+        const endTime = performance.now();
+        const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
+        
+        let html = '<div class="result-stats">Yaklaşık ' + data.total_found + ' sonuç bulundu (' + timeTaken + ' saniye)</div>';
+        
+        if(data.results.length === 0) {
+            html += '<div style="margin-top:30px;"><p>Aradığınız <strong>' + q + '</strong> ile ilgili hiçbir belge bulunamadı.</p><p>Öneriler:</p><ul><li>Tüm kelimeleri doğru yazdığınızdan emin olun.</li><li>Farklı anahtar kelimeler deneyin.</li><li>Daha genel anahtar kelimeler deneyin.</li></ul></div>';
+        } else {
+            data.results.forEach((r, index) => {
+                html += `
+                <div class="result-item" style="animation-delay: ${index * 0.05}s">
+                    <a href="${r.url}" target="_blank" class="result-url">${r.url.substring(0, 50)}...</a>
+                    <a href="${r.url}" target="_blank" class="result-title">${r.title}</a>
+                    <div class="result-desc">
+                        Bu belge AWS MapReduce algoritması tarafından endekslenmiştir. 
+                        Arama sorgunuz ile olan TF-IDF alaka düzeyi skorlandırılmıştır.
+                        <br><span class="tag">TF-IDF: ${Number(r.score).toFixed(4)}</span>
+                        <span class="tag">DOC_ID: ${r.doc_id}</span>
+                    </div>
+                </div>`;
+            });
+        }
+        sonucDiv.innerHTML = html;
+    }catch(e){ 
+        sonucDiv.innerHTML = '<div style="color:#d93025; padding:20px 0;">Sunucu bağlantısında bir hata oluştu. Lütfen tekrar deneyin.</div>'; 
+    }
+}
+</script>
+</body>
+</html>
